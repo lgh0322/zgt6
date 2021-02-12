@@ -60,6 +60,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 int s=0;
 int y;
+int kk=0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM3) {
@@ -67,6 +68,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		s=0;
   }
 
+}
+
+void yes(DMA_HandleTypeDef *_hdma){
+	if(_hdma->Instance==DMA2_Stream0){
+		kk=1;
+	}
 }
 /* USER CODE END 0 */
 
@@ -102,6 +109,7 @@ int main(void)
   MX_FSMC_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+	HAL_DMA_RegisterCallback(&hdma_memtomem_dma2_stream0,HAL_DMA_XFER_CPLT_CB_ID,yes);
 	TFTLCD_Init();
 	unsigned char fuck[]="123456789123456789123456789123456789123456789112345678912345678923456789";
 	LCD_ShowFontHZ(100,100, fuck);
@@ -122,16 +130,18 @@ int main(void)
 			*(u8*)(Bank1_SRAM3_ADDR+k)=123;
 	}
 	s=0;
-	HAL_DMA_Start(&hdma_memtomem_dma2_stream0,Bank1_SRAM3_ADDR,TFTDATA_ADDR,64000);
+	HAL_DMA_Start_IT(&hdma_memtomem_dma2_stream0,Bank1_SRAM3_ADDR,TFTDATA_ADDR,64000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//		LCD_Clear(BLACK);
-//		LCD_ShowNum(50,100,y,3,12);
-//		s++;
+		
+	HAL_DMA_Start_IT(&hdma_memtomem_dma2_stream0,Bank1_SRAM3_ADDR,TFTDATA_ADDR,64000);
+		HAL_Delay(2000);
+		while(kk==0);
+		kk=1;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
